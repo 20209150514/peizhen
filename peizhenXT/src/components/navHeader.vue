@@ -20,7 +20,7 @@
               {{ item.name }}
             </router-link>
            <!-- 关闭按钮 -->
-            <el-icon  size="12" class="close"><Close /> </el-icon>
+            <el-icon  size="12" class="close" @click="closeTab(item,index)"><Close /> </el-icon>
         </li>
       </ul>
     </div>
@@ -51,12 +51,41 @@
 <script setup>
 import { computed } from "vue";
 import { useStore } from "vuex";
-import { useRoute } from "vue-router";
+import { useRoute,useRouter } from "vue-router";
 
+const router=useRouter()
 const route =useRoute()//获取当前路由信息
 const store = useStore()
 const selectMenu = computed(() => store.state.menu.selectMenu); //获取数据
+
+//点击关闭tag
+const closeTab =(item,index)=>{
+  store.commit('closeMenu',item)
+  //删除非当前页tag
+  if(route.path !== item.path){
+    return
+  }
+  const  selectMenuData = selectMenu.value
+  // 如果删除最后一项
+  if(index == selectMenuData.length){
+    //如果tag只有一个元素
+    if(!selectMenuData.length){
+      router.push('/')
+    }  else{
+      router.push({
+        path:selectMenuData[index-1].path
+      })
+    }
+  }else{
+    //如果删除的是中间位置的path
+    router.push({
+      path:selectMenuData[index].path
+    })
+  }
+}
 </script>
+
+
 
 <style lang="less" scoped>
 .flex-box {
